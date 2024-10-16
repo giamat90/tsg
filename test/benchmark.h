@@ -5,7 +5,7 @@
 namespace tsg{
     namespace test{
         template <typename T, typename Fnc, typename ...Args>
-        T do_benchmark(Fnc fun, Args... args){
+        T get_execution_time(Fnc fun, Args... args){
             static_assert(std::is_invocable_v<Fnc, Args...>);
             static_assert(std::is_floating_point_v<T>);
             auto start = std::chrono::high_resolution_clock::now();
