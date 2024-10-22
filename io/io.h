@@ -7,7 +7,7 @@ namespace tsg
     namespace io {
         template <typename T>
         void printf(const T& value){
-            std::cout << value << std::endl;
+            std::cout << value;
         }
 
         template <typename T, typename ...Args>
@@ -16,6 +16,8 @@ namespace tsg
                 if(('{' == *str) && ('}' == *(str + 1))){
                     std::cout << value;
                     return printf(++(++str), args...);
+                } else if('\n' == *str) {
+                    std::cout << std::endl;
                 } else {
                     std::cout << *str++;
                 }
