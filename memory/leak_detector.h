@@ -1,11 +1,12 @@
-#pragma one
+#pragma once
 
 #include <cstddef> 
 #include <array>
 #include <algorithm>
 #include <string>
 
-namespace tsg{    class leak_detector {
+namespace tsg{    
+    class leak_detector {
     public:
         ~leak_detector();
         static leak_detector& get_leak_detector(){

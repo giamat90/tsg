@@ -3,33 +3,10 @@
 
 #include <new>
 #include <cstdlib>
-
+#include <stacktrace>
 #include <vector>
 
 using tsg::io::printf;
-
-
-// void* operator new(std::size_t size){
-//     void* ptr = malloc(size);
-//     printf("Allocating {}bytes of memory on address {}", size, ptr);
-//     return ptr;
-// }
-
-// void operator delete(void* ptr, std::size_t size){
-//     printf("Deallocating memory in address {} for bytes {}", ptr, size);
-//     free(ptr);
-// }
-
-// void* operator new[](std::size_t size){
-//     void* ptr = malloc(size);
-//     printf("Allocating array for {}bytes on address {}", size, ptr);
-//     return ptr;
-// }
-
-// void operator delete[](void* ptr){
-//     printf("Deallocating array in address {}", ptr);
-//     free(ptr);
-// }
 
 void consume_memory(){
     try{
@@ -42,19 +19,25 @@ void consume_memory(){
     }
 }
 
+void foo(){
+    
+    std::cout << std::stacktrace::current() << '\n';
+}
+
 int main(){
     printf("Hello World\n");
 
-    int* p = new int{};
-    int* q = new int{};
-    int* r = new int{};
+    // int* p = new int{};
+    // int* q = new int{};
+    // int* r = new int{};
 
+    foo();
 
-    printf("p = {}\n", p);
-    printf("q = {}\n", q);
-    printf("r = {}\n", r);
+    // printf("p = {}\n", p);
+    // printf("q = {}\n", q);
+    // printf("r = {}\n", r);
 
-    delete r;
+    // delete r;
 
     printf("Goodbye\n");
     return 0;

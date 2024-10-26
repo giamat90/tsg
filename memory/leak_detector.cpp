@@ -16,7 +16,9 @@ void* operator new(std::size_t size){
     //     printf("{}\n", strings[i]);
     // }
     void* ptr = std::malloc(size);
-    tsg::leak_detector::get_leak_detector().addStackInfo(ptr, std::to_string(std::stacktrace::current()));
+    std::cout << std::stacktrace::current() << '\n';
+
+    // tsg::leak_detector::get_leak_detector().addStackInfo(ptr, std::to_string(std::stacktrace::current()));
     if(ptr){
         tsg::leak_detector::get_leak_detector().allocate(ptr, size);
         return ptr;
@@ -27,7 +29,8 @@ void* operator new(std::size_t size){
 
 void* operator new[](std::size_t size, const char* file, int line){
     void* ptr = std::malloc(size);
-    tsg::leak_detector::get_leak_detector().addStackInfo(ptr, std::to_string(std::stacktrace::current()));
+    std::cout << std::stacktrace::current() << '\n';
+    // tsg::leak_detector::get_leak_detector().addStackInfo(ptr, std::to_string(std::stacktrace::current()));
     if(ptr){
         tsg::leak_detector::get_leak_detector().allocate(ptr, size);
         return ptr;
