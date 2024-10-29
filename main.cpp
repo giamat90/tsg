@@ -1,44 +1,36 @@
-#include "io/io.h"
-// #include "memory/leak_detector.h"
-
 #include <new>
 #include <cstdlib>
-#include <stacktrace>
 #include <vector>
 
-using tsg::io::printf;
+#include "io/io.h"
 
-void consume_memory(){
-    try{
-        std::vector<int> vec;
-        for(;;){
-            vec.push_back(42);
-        }        
-    } catch(std::exception& e){
-        printf("Exception catched {}", e.what());
+using tsg::io::print;
+
+struct ICE {
+    template <typename T>
+    static constexpr bool is_ice(T v) {
+        return true;
+    };
+
+    template <typename = std::enable_if<std::is_constant_evaluated(), int>>
+    static constexpr bool is_ice(int& v){
+        return false;
     }
-}
+};
 
-void foo(){
-    
-    std::cout << std::stacktrace::current() << '\n';
-}
+int gx = ICE::is_ice(42);
+int gy = ICE::is_ice(gx);
 
 int main(){
-    printf("Hello World\n");
 
-    // int* p = new int{};
-    // int* q = new int{};
-    // int* r = new int{};
+    int x = ICE::is_ice(21);
+    int y = ICE::is_ice(x);
 
-    foo();
+    print("x {}\n", x);
+    print("y {}\n", y);
 
-    // printf("p = {}\n", p);
-    // printf("q = {}\n", q);
-    // printf("r = {}\n", r);
+    print("gx {}\n", gx);
+    print("gy {}\n", gy);
 
-    // delete r;
-
-    printf("Goodbye\n");
     return 0;
 }
