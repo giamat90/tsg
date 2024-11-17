@@ -39,6 +39,4 @@ namespace tsg
     std::ostream& operator<<(std::ostream& os, const streamable& s){
         return os << s.print();;
     }
-
-
 }

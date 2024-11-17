@@ -5,6 +5,9 @@
 #include <algorithm>
 #include <string>
 
+#include <stacktrace>
+
+
 namespace tsg{    
     class leak_detector {
     public:
@@ -32,9 +35,7 @@ namespace tsg{
             }
             if(index < m_list_size){
                 // m_allocation_list[index] = nullptr;
-                m_stack_info_list[index].pointer = nullptr;
-                m_stack_info_list[index].stack_description.clear();
-                m_deallocated_bytes += bytes;
+                m_stack_info_list[index].pointer = nullptr;                m_deallocated_bytes += bytes;
                 ++m_num_deallocation;
             } 
         };
@@ -53,7 +54,6 @@ namespace tsg{
             if(index < m_list_size){
                 // m_allocation_list[index] = nullptr;
                 m_stack_info_list[index].pointer = nullptr;
-                m_stack_info_list[index].stack_description.clear();
                 ++m_num_deallocation;
             } 
         };
@@ -62,7 +62,7 @@ namespace tsg{
         std::size_t get_deallocated_bytes() const { return m_deallocated_bytes; }
         bool is_memory_leaked() { return m_allocated_bytes > m_deallocated_bytes; }
         std::size_t get_leaked_bytes() { return (m_allocated_bytes - m_deallocated_bytes); }
-        void addStackInfo(void* ptr, const std::string& info){
+        void addStackInfo(void* ptr, const std::stacktrace& info){
             m_stack_info_list[m_allocation_index].pointer = ptr;
             m_stack_info_list[m_allocation_index].stack_description = info;
             ++m_allocation_index;
@@ -75,8 +75,10 @@ namespace tsg{
     private:
         struct stack_info
         {
-            void* pointer;
-            std::string stack_description;
+            using address = void*;
+            using description = std::stacktrace;
+            address pointer;
+            description stack_description;
         };
         stack_info m_stack_info_list[0xffffff];
         const std::size_t m_list_size{0xffffff};
