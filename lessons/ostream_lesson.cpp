@@ -19,9 +19,10 @@ public:
     ObjectStreamable() : streamable() {};
     ~ObjectStreamable(){};
 private:
-    const char* print() const override {
-        return "ObjectStreamable";
+    print_output print() const override {
+        return tsg::print("ObjectStreamable");
     }
+
 };
 
 
