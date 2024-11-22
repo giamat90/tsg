@@ -1,4 +1,5 @@
 #pragma once 
+
 #include <iostream>
 
 namespace tsg
@@ -8,29 +9,28 @@ namespace tsg
         OCT = 1,
         HEX = 2
     };
-
     
     using print_output = std::ostream&;
 
     template <typename T>
-    print_output print(const T& value){
-        return std::cout << value << std::endl;
+    void print(const T& value){
+        std::cout << value << std::endl;
     }
 
     template <typename T, typename ...Args>
-    print_output print(const char* str, const T& value, Args... args){
+    void print(const char* str, const T& value, Args... args){
         while(str && *str){
             if(('{' == *str) && ('}' == *(str + 1))){
                 std::cout << value;
-                return print(++(++str), args...);
+                print(++(++str), args...);
             } else {
-                return std::cout << *str++;
+                std::cout << *str++;
             }
         }
     }
 
     void new_line() {
-        return std::cout << std::endl;
+        std::cout << std::endl;
     };
 
     void numeric_mode(const NUMERIC_TYPE& type) {        
@@ -58,7 +58,6 @@ namespace tsg
     };
 
     std::ostream& operator<<(std::ostream& os, const streamable& s){
-        return s.print();;
-    }
-
+        return s.print();
+    };
 }
