@@ -1,5 +1,7 @@
 #pragma once
 
+#include "../types.h"
+
 namespace tsg{
     template <typename T, typename ...Args>
     static T& get_istance(Args... args){
@@ -8,17 +10,8 @@ namespace tsg{
     }
 
     template <typename T>
-    class singleton {
+    class singleton : public non_copyable {
     public:
-        singleton(const singleton&) = delete;
-        singleton& operator=(const singleton&) = delete;
-
-        // template <typename ...Args>
-        // static T * const get_istance(Args... args){
-        //     static T istance{args...};
-        //     return &istance;
-        // }
-
         template <typename ...Args>
         static T& get_istance(Args... args){
             static T istance{args...};
@@ -29,8 +22,6 @@ namespace tsg{
             return m_istance;
         }
     protected:
-        singleton() = default;
-        ~singleton() = default;
         T* m_istance{this};
     };
 
