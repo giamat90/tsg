@@ -1,6 +1,7 @@
 #pragma once 
 
 #include <iostream>
+#include <bitset>
 
 namespace tsg
 {
@@ -11,6 +12,14 @@ namespace tsg
     };
     
     using print_output = std::ostream&;
+
+    template <typename T>
+    void print_bit(const T& value){
+        constexpr int size = sizeof(T)*sizeof(char);
+        char bits[size];
+        bits = reinterpret_cast<char*>(&value);
+        std::cout << std::bitset<size>(bits) << std::endl;
+    }
 
     template <typename T>
     void print(const T& value){
@@ -50,6 +59,13 @@ namespace tsg
         }
     }
 
+    void enable_boolean(const bool enable){
+        if(enable){
+            std::cout << std::boolalpha;
+        } else {
+            std::cout << std::noboolalpha;
+        }
+    }
 
     class streamable {
     protected:  
