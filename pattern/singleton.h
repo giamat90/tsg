@@ -1,28 +1,52 @@
 #pragma once
 
 #include "../types.h"
+#include "../io/io.h"
 
 namespace tsg{
     template <typename T, typename ...Args>
     static T& get_istance(Args... args){
         static T istance{args...};
         return istance;
-    }
-
+    } 
+    
     template <typename T>
     class singleton : public non_copyable {
     public:
+        singleton() {};
         template <typename ...Args>
         static T& get_istance(Args... args){
-            static T istance{args...};
-            return istance;
-        }
+            if(singleton<T>::m_istance){
+                return *m_istance;
+            } else {
+                static T istance{args...};
+                singleton<T>::m_istance = &istance;
+                tsg::print("m_istance = {}", singleton<T>::m_istance);
+                return istance;
+            }
+        }        
 
-        T* const get_istance(){
-            return m_istance;
+        static T& get_istance(){
+            if(singleton<T>::m_istance){
+                tsg::print("m_istance already exist!");
+                return *m_istance;
+            } else {
+                static T istance;
+                singleton<T>::m_istance = &istance;
+                tsg::print("creating a new istance = {}", singleton<T>::m_istance);
+                return istance;
+            }
         }
-    protected:
-        T* m_istance{this};
+    private:
+        static T* m_istance;
+        static std::size_t m_istances_count;
     };
+
+    template<typename T>
+    T* singleton<T>::m_istance = nullptr;
+
+    template<typename T>
+    std::size_t singleton<T>::m_istances_count{};
+
 
 }
