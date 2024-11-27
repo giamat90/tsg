@@ -1,12 +1,16 @@
 #include <iostream>     // cout, endl
-#include <map>          // map
 #include <vector>       // vector
 #include <conio.h>      // _kbhit, getch
 #include <windows.h>    // GetStdHandle, SetConsoleTextAttribute
 #include <sstream>      // stringstream
 
+// defines for version
+#ifndef VERSION_MAJOR
 #define VERSION_MAJOR 1
-#define VERSION_MINOR 1
+#endif
+#ifndef VERSION_MINOR
+#define VERSION_MINOR 3
+#endif
 
 // very important keys
 constexpr char esc{27};
@@ -46,22 +50,39 @@ std::string get_version(){
     return ss.str();
 }
 
+void print_christmas_tree(){
+    colored_cout("\t\t     *\n", green);
+    colored_cout("\t\t    ***\n", red);
+    colored_cout("\t\t   *****\n", bright_green);
+    colored_cout("\t\t  *******\n", bright_red);
+    colored_cout("\t\t *********\n", green);
+    colored_cout("\t\t***********\n", red);
+    colored_cout("\t\t     *  \n", bright_green);
+    change_text_color(bright_white);
+}
+
 void print_banner(){
-    std::cout << "You runned secret santa roulette software version " << get_version() << std::endl;
+    print_christmas_tree();
+    std::cout << "You are running secret santa roulette software version " << get_version();
+    std::cout << "made by TheStandardGuy (www.youtube.com/@tsg_ita)." << std::endl;
+    std::cout << "First you add the partecipants to the secret sant (no limits on how many can partecipates).";
+    std::cout << "Then you start the ruolette.\nMake your partecipants stop the roulette and choice if they want ";
+    std::cout << "another secret-pair or not. Enjoy it!" << std::endl;
 }
 
 char ask_until_yes_or_no(const std::string& question){
     char answer{};
     while(yes != answer && no != answer){
-        std::cout << question << " (y/n)" << std::endl;
+        std::cout << question << " (y/n): ";
         answer = get_keyboard_input();
     }
+    std::cout << answer << std::endl;
     return answer;
 }
 
 char ask_until_ret_or_esc(const std::string& question){
     char answer{};
-    while( esc != answer && enter != answer){
+    while(esc != answer && enter != answer){
         std::cout << question << std::endl;
         answer = get_keyboard_input();
     }
@@ -82,7 +103,19 @@ void insult(){
     change_text_color(bright_green);
 }
 
+void erase_previous_row(const int n_rows = 0){
+    if(0 == n_rows){
+        std::cout << "\033[1A";
+    } else {
+        std::string s{};
+        s += "\033[" + std::to_string(n_rows) + "A";
+        std::cout << s;
+    }
+    std::cout << "\x1b[2K";
+}
+
 int main() {
+    change_text_color(bright_white);
     print_banner();
     char answer = ask_until_yes_or_no("Do you want to organize a secret santa?");
     if(no == answer){
@@ -104,7 +137,8 @@ int main() {
         }
         answer = ask_until_yes_or_no("Do you want add a secret santa partecipant?");
     }
-    std::string eraser_string(max_name_len_partecipant, '\b');    
+    std::string eraser_string(max_name_len_partecipant, '\b');
+    std::string eraser_line_string{"\x1b[2K"};    
 
     // Start the roulette
     std::vector<int> console_colors{bright_red, bright_green, red, green};
@@ -132,6 +166,7 @@ int main() {
         // throw way the keyboard input
         consume_keyboard_input();
         std::cout << eraser_string;
+        erase_previous_row();
         colored_cout("Your pair-santa is: ", bright_white);
         colored_cout(*it_santa, *it_console_color);
         pair_color = *it_console_color;
@@ -142,19 +177,29 @@ int main() {
         std::cout << std::endl;
         change_text_color(bright_white);
         answer = ask_until_yes_or_no("Do you want to change your pair-santa and retry the roulette?");
+        HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
+        erase_previous_row(2);
+        // std::cout << "\033[2A"; //\033[F";   // goes two rows above         
+        for(std::size_t i{0u}; i < 42u; ++i){
+            colored_cout("*", get_next_color());
+        }
+        std::cout << std::endl;
+        std::cout << "\x1b[2K"; // delete the whole row        
+        change_text_color(bright_white);
         if(no == answer){
-            HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
-            std::cout << "\033[F\033[F";
-            std::cout << "******************************************" << std::endl;
-            std::cout << "Do you want to change your pair-santa and retry the roulette?" << std::endl;
             secret_santa_partecipants.erase(it_santa);
             it_santa = secret_santa_partecipants.begin();
+            if(secret_santa_partecipants.size() > 0){
+                std::cout << "To stop the roulette press any key." << std::endl;
+            }
+        } else {
+            std::cout << "To stop the roulette press any key." << std::endl;
         }
     }
     if(esc != answer){
         colored_cout("Wish you a very happy Christmas!!!", pair_color);
         change_text_color(bright_white);
-        std::cout << std::endl;
+        // std::cout << std::endl;
     }
     
     return 0;
