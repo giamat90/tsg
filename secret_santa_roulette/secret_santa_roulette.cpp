@@ -5,12 +5,10 @@
 #include <sstream>      // stringstream
 
 // defines for version
-#ifndef VERSION_MAJOR
-#define VERSION_MAJOR 1
-#endif
-#ifndef VERSION_MINOR
-#define VERSION_MINOR 3
-#endif
+#define VERSION_MAJOR 2
+#define VERSION_MINOR 0
+#define VERSION_REVISION 2
+#define VERSION_BUILD 4
 
 // very important keys
 constexpr char esc{27};
@@ -46,7 +44,7 @@ void colored_cout(Streamable s, int color){
 
 std::string get_version(){
     std::stringstream ss;
-    ss << VERSION_MAJOR << "." << VERSION_MINOR;
+    ss << VERSION_MAJOR << "." << VERSION_MINOR << "." << VERSION_REVISION << "." << VERSION_BUILD;
     return ss.str();
 }
 
@@ -64,7 +62,7 @@ void print_christmas_tree(){
 void print_banner(){
     print_christmas_tree();
     std::cout << "You are running secret santa roulette software version " << get_version();
-    std::cout << "made by TheStandardGuy (www.youtube.com/@tsg_ita)." << std::endl;
+    std::cout << " made by TheStandardGuy (www.youtube.com/@tsg_ita)." << std::endl;
     std::cout << "First you add the partecipants to the secret sant (no limits on how many can partecipates).";
     std::cout << "Then you start the ruolette.\nMake your partecipants stop the roulette and choice if they want ";
     std::cout << "another secret-pair or not. Enjoy it!" << std::endl;
