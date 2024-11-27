@@ -3,6 +3,10 @@
 #include <vector>       // vector
 #include <conio.h>      // _kbhit, getch
 #include <windows.h>    // GetStdHandle, SetConsoleTextAttribute
+#include <sstream>
+
+#define VERSION_MAJOR 0
+#define VERSION_MINOR 2
 
 int get_keyboard_input(){
     while(!_kbhit()){}
@@ -24,7 +28,18 @@ void colored_cout(Streamable s, int color){
     std::cout << s;
 }
 
+std::string get_version(){
+    std::stringstream ss;
+    ss << VERSION_MAJOR << "." << VERSION_MINOR;
+    return ss.str();
+}
+
+void print_banner(){
+    std::cout << "You runned secret santa roulette software version " << get_version() << std::endl;
+}
+
 int main() {
+    print_banner();
     constexpr char esc{27};
     constexpr char ret{13};
     constexpr int green{2};
