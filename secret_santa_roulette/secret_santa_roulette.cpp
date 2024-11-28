@@ -2,7 +2,6 @@
 #include <vector>       // vector
 #include <conio.h>      // _kbhit, getch
 #include <windows.h>    // GetStdHandle, SetConsoleTextAttribute
-#include <sstream>      // stringstream
 
 // defines for version
 #define VERSION_MAJOR 2
@@ -16,11 +15,13 @@ constexpr char enter{13};
 constexpr char yes{'y'};
 constexpr char no{'n'};
 // console colors
-constexpr int green{2};
-constexpr int red{4};
-constexpr int bright_green{10};
-constexpr int bright_red{12};
-constexpr int bright_white{15};
+enum class CONSOLE_COLOR : int {
+    GREEN = 2,
+    RED = 4,
+    BRIGHT_GREEN = 10,
+    BRIGHT_RED = 12,
+    BRIGHT_WHITE = 15
+};
 
 int get_keyboard_input(){
     while(!_kbhit()){}
@@ -31,37 +32,45 @@ void consume_keyboard_input(){
     getch();
 }
 
-void change_text_color(const int color){
+void change_text_color(const CONSOLE_COLOR color){
     HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
-    SetConsoleTextAttribute(hConsole, color);
+    SetConsoleTextAttribute(hConsole, static_cast<int>(color));
 }
 
 template <typename Streamable> 
-void colored_cout(Streamable s, int color){
+void colored_cout(Streamable s, const CONSOLE_COLOR color){
     change_text_color(color);
     std::cout << s;
 }
 
-std::string get_version(){
-    std::stringstream ss;
-    ss << VERSION_MAJOR << "." << VERSION_MINOR << "." << VERSION_REVISION << "." << VERSION_BUILD;
-    return ss.str();
+void print_version(){    
+    colored_cout(VERSION_MAJOR, CONSOLE_COLOR::GREEN);
+    colored_cout(".", CONSOLE_COLOR::BRIGHT_RED);
+    colored_cout(VERSION_MINOR, CONSOLE_COLOR::RED);
+    colored_cout(".", CONSOLE_COLOR::BRIGHT_GREEN);
+    colored_cout(VERSION_REVISION, CONSOLE_COLOR::BRIGHT_GREEN);
+    colored_cout(".", CONSOLE_COLOR::RED);
+    colored_cout(VERSION_BUILD, CONSOLE_COLOR::BRIGHT_RED);
+    colored_cout(".", CONSOLE_COLOR::GREEN);
+    change_text_color(CONSOLE_COLOR::BRIGHT_WHITE);
 }
 
-void print_christmas_tree(){
-    colored_cout("\t\t     *\n", green);
-    colored_cout("\t\t    ***\n", red);
-    colored_cout("\t\t   *****\n", bright_green);
-    colored_cout("\t\t  *******\n", bright_red);
-    colored_cout("\t\t *********\n", green);
-    colored_cout("\t\t***********\n", red);
-    colored_cout("\t\t     *  \n", bright_green);
-    change_text_color(bright_white);
+void print_christmas_tree(int n_tabs = 0){
+    std::string tabs(n_tabs, '\t');
+    colored_cout(tabs + "     *\n", CONSOLE_COLOR::GREEN);
+    colored_cout(tabs + "    ***\n", CONSOLE_COLOR::RED);
+    colored_cout(tabs + "   *****\n", CONSOLE_COLOR::BRIGHT_GREEN);
+    colored_cout(tabs + "  *******\n", CONSOLE_COLOR::BRIGHT_RED);
+    colored_cout(tabs + " *********\n", CONSOLE_COLOR::GREEN);
+    colored_cout(tabs + "***********\n", CONSOLE_COLOR::RED);
+    colored_cout(tabs + "    ***     \n", CONSOLE_COLOR::BRIGHT_GREEN);
+    change_text_color(CONSOLE_COLOR::BRIGHT_WHITE);
 }
 
 void print_banner(){
-    print_christmas_tree();
-    std::cout << "You are running secret santa roulette software version " << get_version();
+    print_christmas_tree(4);
+    std::cout << "You are running secret santa roulette software version ";// << get_version();
+    print_version();
     std::cout << " made by TheStandardGuy (www.youtube.com/@tsg_ita)." << std::endl;
     std::cout << "First you add the partecipants to the secret sant (no limits on how many can partecipates).";
     std::cout << "Then you start the ruolette.\nMake your partecipants stop the roulette and choice if they want ";
@@ -88,17 +97,17 @@ char ask_until_ret_or_esc(const std::string& question){
 }
 
 void insult(){
-    colored_cout("You are a f", bright_green);
-    colored_cout("*", bright_red);
-    colored_cout("*", bright_green);
-    colored_cout("*", bright_red);
-    colored_cout("*", bright_green);
-    colored_cout("*", bright_red);
-    colored_cout("g grinch", bright_green);
-    colored_cout("!", bright_red);
-    colored_cout("!", bright_green);
-    colored_cout("!", bright_red);
-    change_text_color(bright_green);
+    colored_cout("You are a f", CONSOLE_COLOR::BRIGHT_GREEN);
+    colored_cout("*", CONSOLE_COLOR::BRIGHT_RED);
+    colored_cout("*", CONSOLE_COLOR::BRIGHT_GREEN);
+    colored_cout("*", CONSOLE_COLOR::BRIGHT_RED);
+    colored_cout("*", CONSOLE_COLOR::BRIGHT_GREEN);
+    colored_cout("*", CONSOLE_COLOR::BRIGHT_RED);
+    colored_cout("g grinch", CONSOLE_COLOR::BRIGHT_GREEN);
+    colored_cout("!", CONSOLE_COLOR::BRIGHT_RED);
+    colored_cout("!", CONSOLE_COLOR::BRIGHT_GREEN);
+    colored_cout("!", CONSOLE_COLOR::BRIGHT_RED);
+    change_text_color(CONSOLE_COLOR::BRIGHT_GREEN);
 }
 
 void erase_previous_row(const int n_rows = 0){
@@ -113,7 +122,7 @@ void erase_previous_row(const int n_rows = 0){
 }
 
 int main() {
-    change_text_color(bright_white);
+    change_text_color(CONSOLE_COLOR::BRIGHT_WHITE);
     print_banner();
     char answer = ask_until_yes_or_no("Do you want to organize a secret santa?");
     if(no == answer){
@@ -139,8 +148,8 @@ int main() {
     std::string eraser_line_string{"\x1b[2K"};    
 
     // Start the roulette
-    std::vector<int> console_colors{bright_red, bright_green, red, green};
-    int pair_color{bright_white};
+    std::vector<CONSOLE_COLOR> console_colors{CONSOLE_COLOR::BRIGHT_RED, CONSOLE_COLOR::BRIGHT_GREEN, CONSOLE_COLOR::RED, CONSOLE_COLOR::GREEN};
+    CONSOLE_COLOR pair_color{CONSOLE_COLOR::BRIGHT_WHITE};
     answer = ask_until_ret_or_esc("Press enter to start secret santa roulette, esc to terminate.");
     if(esc == answer){
         insult();
@@ -165,7 +174,7 @@ int main() {
         consume_keyboard_input();
         std::cout << eraser_string;
         erase_previous_row();
-        colored_cout("Your pair-santa is: ", bright_white);
+        colored_cout("Your pair-santa is: ", CONSOLE_COLOR::BRIGHT_WHITE);
         colored_cout(*it_santa, *it_console_color);
         pair_color = *it_console_color;
         auto get_next_color = [&](){ return ++it_console_color == console_colors.end() ? *(it_console_color = console_colors.begin()) : *it_console_color;};
@@ -173,7 +182,7 @@ int main() {
         colored_cout("!", get_next_color());
         colored_cout("!", get_next_color());
         std::cout << std::endl;
-        change_text_color(bright_white);
+        change_text_color(CONSOLE_COLOR::BRIGHT_WHITE);
         answer = ask_until_yes_or_no("Do you want to change your pair-santa and retry the roulette?");
         HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
         erase_previous_row(2);
@@ -183,7 +192,7 @@ int main() {
         }
         std::cout << std::endl;
         std::cout << "\x1b[2K"; // delete the whole row        
-        change_text_color(bright_white);
+        change_text_color(CONSOLE_COLOR::BRIGHT_WHITE);
         if(no == answer){
             secret_santa_partecipants.erase(it_santa);
             it_santa = secret_santa_partecipants.begin();
@@ -196,8 +205,9 @@ int main() {
     }
     if(esc != answer){
         colored_cout("Wish you a very happy Christmas!!!", pair_color);
-        change_text_color(bright_white);
-        // std::cout << std::endl;
+        std::cout << std::endl << std::endl;
+        print_christmas_tree(2);
+        change_text_color(CONSOLE_COLOR::BRIGHT_WHITE);
     }
     
     return 0;
