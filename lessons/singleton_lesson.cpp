@@ -1,34 +1,25 @@
-#include "../pattern/singleton.h"
 #include "../io/io.h"
+#include "../types.h"
 
-class A {
+// Object that should be a singleton
+class A : public tsg::non_copyable {
 public:
     A(int a) : m_a(a){};
     ~A(){};
     void print(){
         tsg::print("Hello from object {} a = {}", this, m_a);
     }
+    void do_something(){
+        ++m_a;
+    }
 private:
     int m_a{};
 };
 
-class B : public tsg::singleton<B> {
-public:
-    B(const int b = 0) : m_b(b) {
-        tsg::print("B c-tor {}", this);
-    }
-    ~B(){
-        tsg::print("B d-tor {}", this);
-    }
-    void print(){
-        tsg::print("print from {},{}", m_b, this);
-    }
-private:
-    int m_b;
-};
 
-int& get_istance(){
-    static int istance{42};
+// Getting i singleton istance
+A& get_istance(){
+    static A istance{42};
     return istance;
 }
 
@@ -36,42 +27,34 @@ int main(){
     tsg::print("Hello World");
     tsg::new_line();
 
-    tsg::print("### Mayer's singleton pattern: wrong ###");
+    tsg::print("### Dangerous use of singleton ###");
     {
-        int x = get_istance();
-        auto y = get_istance();
-        tsg::print("x = {}", x);
-        tsg::print("y = {}", y);
-        y = 21;
-        tsg::print("x = {}", x);
-        tsg::print("y = {}", y);
+        // A x = get_istance();     // error: use of deleted function 'A::A(const A&)'
+        // auto y = get_istance();  // error: use of deleted function 'A::A(const A&)'
+        A& x = get_istance();       // ok
+        A& y = get_istance();       // ok
+        // print the state of our singletons
+        x.print();
+        y.print();
+        // change the internal state of our singleton 
+        y.do_something();
+        // print again the state of our singleton
+        x.print();
+        y.print();
     }
     tsg::print("### ### #### ###");
     tsg::new_line();
 
-    tsg::print("### Mayer's singleton pattern: correct ###");
+    tsg::print("### Correct use of singleton ###");
     {
-        int& x = get_istance();
-        int& y = get_istance();
-        tsg::print("x = {}", x);
-        tsg::print("y = {}", y);
-        y = 21;
-        tsg::print("x = {}", x);
-        tsg::print("y = {}", y);
-    }
-    tsg::print("### ### #### ###");
-    tsg::new_line();
-
-    // B myB = B::get_istance(42); // error: use of deleted function ‘B::B(const B&)’
-    B& myB = B::get_istance(42);   // ok
-    tsg::print("### Class singleton ###");
-    {
-        B::get_istance(42).print();
-        B::get_istance().print();
-        tsg::new_line();
-        tsg::print("checkpoint");
-        tsg::new_line();
-        B::get_istance(21).print();
+        // print the state of our singletons
+        x.print();
+        y.print();
+        // change the internal state of our singleton 
+        y.do_something();
+        // print again the state of our singleton
+        x.print();
+        y.print();
     }
     tsg::print("### ### #### ###");
     tsg::new_line();

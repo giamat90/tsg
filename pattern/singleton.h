@@ -13,10 +13,10 @@ namespace tsg{
     template <typename T>
     class singleton : public non_copyable {
     public:
-        singleton() {};
         template <typename ...Args>
         static T& get_istance(Args... args){
             if(singleton<T>::m_istance){
+                tsg::print("m_istance already exist!");
                 return *m_istance;
             } else {
                 static T istance{args...};
@@ -39,14 +39,8 @@ namespace tsg{
         }
     private:
         static T* m_istance;
-        static std::size_t m_istances_count;
     };
 
     template<typename T>
     T* singleton<T>::m_istance = nullptr;
-
-    template<typename T>
-    std::size_t singleton<T>::m_istances_count{};
-
-
 }

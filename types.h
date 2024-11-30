@@ -9,8 +9,7 @@ namespace tsg {
         ~non_copyable() = default;
         non_copyable(const non_copyable&) = delete;
         non_copyable& operator=(const non_copyable&) = delete;
-    }
-
+    };
 
     template <typename T, typename = std::enable_if_t<std::is_same<T, int>::value>>
     static constexpr bool is_ice(T v) {
