@@ -31,7 +31,7 @@ namespace tsg
         while(str && *str){
             if(('{' == *str) && ('}' == *(str + 1))){
                 std::cout << value;
-                print(++(++str), args...);
+                return print(++(++str), args...);
             } else {
                 std::cout << *str++;
             }
