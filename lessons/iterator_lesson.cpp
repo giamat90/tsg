@@ -2,7 +2,7 @@
 
 class Object {
     
-}
+};
 
 int main(){
     tsg::print("Hello World");
