@@ -22,12 +22,12 @@ namespace tsg
     }
 
     template <typename T>
-    void print(const T& value){
-        std::cout << value << std::endl;
+    print_output print(const T& value){
+        return std::cout << value << std::endl;
     }
 
     template <typename T, typename ...Args>
-    void print(const char* str, const T& value, Args... args){
+    print_output print(const char* str, const T& value, Args... args){
         while(str && *str){
             if(('{' == *str) && ('}' == *(str + 1))){
                 std::cout << value;
@@ -36,6 +36,7 @@ namespace tsg
                 std::cout << *str++;
             }
         }
+        return std::cout;
     }
 
     void new_line() {

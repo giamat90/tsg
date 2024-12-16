@@ -23,7 +23,7 @@ namespace tsg{
         }
     }
 
-    
+    /* Computing N° tartaglia number */
     using tartaglia_t = uint64_t;
 
     template<std::size_t N>
@@ -32,10 +32,6 @@ namespace tsg{
         values[N] = 1;
         tartaglia_t previous[N];
         get_tartaglia_numbers<N-1>(previous);
-        // for(int i = 0; i < N; ++i){
-        //     std::cout << previous[i] << " ";
-        // }
-        // tsg::new_line();
         for(int i = 1; i < N; ++i){
             values[i] = previous[i] + previous[i-1]; 
         }
