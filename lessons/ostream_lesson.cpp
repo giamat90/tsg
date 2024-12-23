@@ -19,8 +19,8 @@ public:
     ObjectStreamable() : streamable() {};
     ~ObjectStreamable(){};
 private:
-    print_output print() const override {
-        return tsg::print("ObjectStreamable");
+    tsg::print_output print() const override {
+        return tsg::print("ObjectStreamable {}", this);
     }
 
 };

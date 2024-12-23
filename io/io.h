@@ -22,27 +22,28 @@ namespace tsg
     }
 
     template <typename T>
-    void print(const T& value){
-        std::cout << value << std::endl;
+    inline print_output print(const T value){
+        return std::cout << value << std::endl;
     }
 
     template <typename T, typename ...Args>
-    void print(const char* str, const T& value, Args... args){
+    inline print_output print(const char* str, const T& value, Args... args){
         while(str && *str){
             if(('{' == *str) && ('}' == *(str + 1))){
                 std::cout << value;
-                print(++(++str), args...);
+                return print(++(++str), args...);
             } else {
                 std::cout << *str++;
             }
         }
+        return std::cout;
     }
 
-    void new_line() {
+    inline void new_line() {
         std::cout << std::endl;
     };
 
-    void numeric_mode(const NUMERIC_TYPE& type) {        
+    inline void numeric_mode(const NUMERIC_TYPE& type) {
         switch (type)
         {
         case NUMERIC_TYPE::DEC:
@@ -59,7 +60,7 @@ namespace tsg
         }
     }
 
-    void enable_boolean(const bool enable){
+    inline void enable_boolean(const bool enable){
         if(enable){
             std::cout << std::boolalpha;
         } else {
@@ -69,8 +70,8 @@ namespace tsg
 
     class streamable {
     protected:  
-        virtual print_output print() const = 0;
-        friend std::ostream& operator<<(std::ostream& os, const streamable& s);
+        virtual inline print_output print() const = 0;
+        friend inline std::ostream& operator<<(std::ostream& os, const streamable& s);
     };
 
     std::ostream& operator<<(std::ostream& os, const streamable& s){
