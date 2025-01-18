@@ -3,6 +3,14 @@
 
 namespace tsg {
 
+    template<typename T>
+    class adapter {
+    public:
+        inline T* const get_adaptee() { return m_adaptee; }
+    protected:
+        T* m_adaptee;
+    };
+
     class non_copyable {
     public:
         non_copyable() = default;
