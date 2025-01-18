@@ -22,7 +22,7 @@ namespace tsg
     }
 
     template <typename T>
-    inline print_output print(const T value){
+    inline print_output print(const T& value){
         return std::cout << value << std::endl;
     }
 
