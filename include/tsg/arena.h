@@ -6,8 +6,8 @@
 #include <cstdint>
 
 namespace tsg{
-using arena_size = std::size_t;
-template <arena_size S = 64u>
+    using arena_size = std::size_t;
+    template <arena_size S = 64u>
     class arena {
     public:
         arena(){}

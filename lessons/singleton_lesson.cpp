@@ -1,5 +1,9 @@
-#include "../io/io.h"
-#include "../types.h"
+#include "lesson.h"
+
+#if SINGLETON_LESSON_ACTIVE
+
+#include <tsg/io.h>
+#include <tsg/types.h>
 
 // Object that should be a singleton
 class A : public tsg::non_copyable {
@@ -23,7 +27,7 @@ A& get_istance(){
     return istance;
 }
 
-int main(){
+void lesson::run(){
     tsg::print("Hello World");
     tsg::new_line();
 
@@ -47,6 +51,8 @@ int main(){
 
     tsg::print("### Correct use of singleton ###");
     {
+        A& x = get_istance();       // ok
+        A& y = get_istance();       // ok
         // print the state of our singletons
         x.print();
         y.print();
@@ -60,5 +66,6 @@ int main(){
     tsg::new_line();
 
     tsg::print("Goodbye");
-    return 0;
 }
+
+#endif

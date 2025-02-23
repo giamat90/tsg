@@ -2,10 +2,12 @@
 
 #include <cstdint>
 
+#include "io.h"
+
 namespace tsg{
     using factorial_t = uint64_t;
 
-    template <std::size_t N>
+    template <size_t N>
     inline factorial_t factorial(){
         return N * factorial<N-1>();
     }
@@ -26,7 +28,7 @@ namespace tsg{
     /* Computing N° tartaglia number */
     using tartaglia_t = uint64_t;
 
-    template<std::size_t N>
+    template<size_t N>
     inline void get_tartaglia_numbers(tartaglia_t values[N+1]){
         values[0] = 1;
         values[N] = 1;
@@ -47,4 +49,10 @@ namespace tsg{
             values[0] = 1;
             values[1] = 1;
     }
+  
+    template<typename T>
+    inline constexpr T pow(const T base, const T exp){
+        return exp > 0 ? base * pow(base, exp-1) : 1;
+    }
+
 }

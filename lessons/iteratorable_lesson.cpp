@@ -1,4 +1,8 @@
-#include "../io/io.h"
+#include "lesson.h"
+
+#if ITERATORABLE_LESSON_ACTIVE
+
+#include <tsg/io.h>
 
 
 class Iterable {
@@ -18,8 +22,9 @@ class Iterable {
         using pointer = T*;
         using reference = T&;
 
-        Iterator(Iterable* buf, size_t idx, size_t cnt = 0) 
-            : container(container), index(idx), count(cnt) {
+        Iterator(Iterable* container_, size_t idx, size_t cnt = 0)
+            : container(container_), index(idx), count(cnt) 
+        {
             ptr = &container->data[index];
         }
 
@@ -56,7 +61,8 @@ public:
     ~Object(){};
 };
 
-int main(){
+void lesson::run(){
 
-    return 0;
 }
+
+#endif

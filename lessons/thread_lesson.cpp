@@ -1,3 +1,7 @@
+#include "lesson.h"
+
+#if THREAD_LESSON_ACTIVE
+
 // Example program
 #include <iostream>
 #include <thread>
@@ -18,7 +22,7 @@ void bar(){
     }
 }
 
-int main()
+void lesson::run()
 {
     std::thread th1(foo);
     std::thread th2(bar);
@@ -28,3 +32,5 @@ int main()
     th1.join();
     th2.join();
 }
+
+#endif

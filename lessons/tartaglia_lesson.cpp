@@ -1,6 +1,10 @@
-#include "../io/io.h"
-#include "../test/benchmark.h"
-#include "../math/math.h"
+#include "lesson.h"
+
+#if TARTAGLIA_LESSON_ACTIVE
+
+#include <tsg/io.h>
+#include <tsg/benchmark.h>
+#include <tsg/math.h>
 
 template <std::size_t N>
 void print_tartaglia_numbers(tsg::tartaglia_t numbers[N+1]){
@@ -28,7 +32,7 @@ constexpr int find_max_tartaglia_degree(){
     return --n;
 }
 
-int main(){
+void lesson::run(){
     tsg::print("Hello World");
 
     // tsg::print("max uint8_t = {}", find_max_tartaglia_degree<uint8_t>());
@@ -70,5 +74,6 @@ int main(){
 
     tsg::new_line();
     tsg::print("Goodbye");
-    return 0;
 }
+
+#endif

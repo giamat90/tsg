@@ -1,13 +1,21 @@
-#include "../io/io.h"
+#include "lesson.h"
+
+#if ALLOCATOR_LESSON_ACTIVE
+
+#include <tsg/io.h>
 #include <vector>
+
 
 // custom allocator
 template <typename T>
 class my_allocator {
 public:
     using value_type = T;   // mandatory
-    my_allocator(){};
-    ~my_allocator(){};
+    my_allocator() = default;
+    ~my_allocator() = default;
+
+    template<typename U>
+    my_allocator(const my_allocator<U>&) noexcept {}
     
     T* allocate(std::size_t n){
         tsg::print("my_allocator::allocate n = {} for size = {}", n, n * sizeof(T));
@@ -45,7 +53,7 @@ void addAndPrint(E el, C& container){
     printContainer(container);
 }
 
-int main(){
+void lesson::run(){
     tsg::print("Hello World");
     {   // container with integer example
         std::vector<int, my_allocator<int>> vec;
@@ -97,6 +105,7 @@ int main(){
         tsg::print("vec.capacity = {}", vec.capacity());
         tsg::print("other_vec.capacity = {}", other_vec.capacity());
     }
-    tsg::print("Goodbye");    
-    return 0;
+    tsg::print("Goodbye"); 
 }
+
+#endif

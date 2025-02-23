@@ -1,4 +1,9 @@
-#include "../io/io.h"
+#include "lesson.h"
+
+#if CAST_LESSON_ACTIVE
+
+#include <tsg/io.h>
+
 
 class Base
 {
@@ -58,7 +63,7 @@ public:
     ~Derived3() {};
 };
 
-int main()
+void lesson::run()
 {
     tsg::print("Hello World");
     tsg::new_line();
@@ -121,5 +126,6 @@ int main()
     tsg::new_line();
 
     tsg::print("Goodbye!");
-    return 0;
 }
+
+#endif

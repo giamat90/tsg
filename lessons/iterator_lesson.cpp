@@ -1,9 +1,12 @@
-#include "../io/io.h"
+#include "lesson.h"
+
+#if ITERATOR_LESSON_ACTIVE
+#include <tsg/io.h>
+#include <tsg/types.h>
 #include <iterator>
 #include <algorithm>
 #include <vector>
 
-#include "../types.h"
 
 template<typename T, std::size_t Size>
 class Object : public tsg::streamable {
@@ -15,11 +18,10 @@ public:
         tsg::print("Object dtor {}", this);
     }
     tsg::print_output print() const override {
-        // tsg::print("cp1");
         for(std::size_t i = 0u; i < Size; ++i){
             tsg::print("data[{}] = ({}, {})", i, m_data[i], &m_data[i]);
         }
-        tsg::print("cp2");
+        return tsg::print("cp2");
     }
     bool push_back(const T value) {
         if (m_index < Size) {
@@ -139,7 +141,7 @@ private:
     int m_data[100];
 };
 
-int main() {
+void lesson::run() {
     tsg::print("Hello World");
     
     Object<int, 10> obj;
@@ -202,5 +204,6 @@ int main() {
     }
 
     tsg::print("Goodbye");
-    return 0;
 }
+
+#endif

@@ -1,7 +1,7 @@
 #pragma once
 
 #include "memory_types.h"
-#include "../io/io.h"
+#include "io.h"
 
 using tsg::print;
 

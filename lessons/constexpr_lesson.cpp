@@ -1,3 +1,7 @@
+#include "lesson.h"
+
+#if CONSTEXPR_LESSON_ACTIVE
+
 int get_value(){
     return 42;
 }
@@ -22,7 +26,7 @@ constexpr int cefact(const int n){
     return n <= 1 ? 1 : n*cefact(n-1);
 }
 
-int main() {
+void lesson::run() {
     int i = get_value();
     const int ci = get_cvalue();
     constexpr int cei = get_cevalue();
@@ -30,6 +34,6 @@ int main() {
     int fact10 = fact(10);
     const int cfact10 = cfact(10);
     constexpr int cefact10 = cefact(10);
-
-    return 0;
 }
+
+#endif

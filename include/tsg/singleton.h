@@ -1,7 +1,7 @@
 #pragma once
 
-#include "../types.h"
-#include "../io/io.h"
+#include "types.h"
+#include "io.h"
 
 namespace tsg{
     template <typename T, typename ...Args>

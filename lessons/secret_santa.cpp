@@ -1,3 +1,7 @@
+#include "lesson.h"
+
+#if SECRET_SANTA_ACTIVE
+
 #include <iostream>     // cout, endl
 #include <map>          // map
 #include <vector>       // vector
@@ -38,7 +42,7 @@ void print_banner(){
     std::cout << "You runned secret santa roulette software version " << get_version() << std::endl;
 }
 
-int main() {
+void lesson::run() {
     print_banner();
     constexpr char esc{27};
     constexpr char ret{13};
@@ -102,5 +106,6 @@ int main() {
         std::cout << std::endl;
     }
     
-    return 0;
 }
+
+#endif

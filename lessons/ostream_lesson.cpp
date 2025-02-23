@@ -1,4 +1,8 @@
-#include "../io/io.h"
+#include "lesson.h"
+
+#if OSTREAM_LESSON_ACTIVE
+
+#include <tsg/io.h>
 #include <iostream>
 
 class Object{
@@ -26,12 +30,12 @@ private:
 };
 
 
-int main(){
+void lesson::run(){
     Object obj;
     tsg::print(obj);
 
     ObjectStreamable objS;
     tsg::print(objS);
-
-    return 0;
 }
+
+#endif
