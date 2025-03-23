@@ -13,6 +13,15 @@ namespace tsg {
         T* m_adaptee{ nullptr };
     };
 
+    template<typename T>
+    class adapter_v {
+    public:
+        inline T* const get_adaptee() { return &m_adaptee; }
+        inline void set_adaptee(const T a) { m_adaptee = a; }
+    protected:
+        T m_adaptee{};
+    };
+
     class non_copyable {
     public:
         non_copyable() = default;
