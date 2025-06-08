@@ -11,7 +11,6 @@ file(GLOB TSG_SOURCES
     "${CMAKE_CURRENT_SOURCE_DIR}/include/tsg/*.h"
 )
 
-
 add_library(tsg SHARED ${TSG_SOURCES})
 
 include_directories(${CMAKE_SOURCE_DIR}/include)
