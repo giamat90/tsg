@@ -55,4 +55,42 @@ namespace tsg{
         return exp > 0 ? base * pow(base, exp-1) : 1;
     }
 
+    template <typename T, T M>
+    class module {
+    public:
+        module(const T value) {
+            if (value > M) {
+                m_value += T(0);
+            }
+            if (value < 0) {
+                m_value -= T(0);
+            }
+        }
+        inline module<T,M>& operator+=(const module<T, M>& other) {
+            m_value += other.m_value;
+            if (m_value > M) {
+                m_value -= M;
+            }
+        }
+        inline friend module<T, M> operator+(module<T, M> lhs, const module<T, M>& rhs) {
+            lhs += rhs;
+            return lhs;
+        }
+        inline module<T, M>& operator-=(const module<T, M>& other) {
+            m_value -= other.m_value;
+            if (m_value < T(0)) {
+                m_value = M - m_value;
+            }
+        }
+        inline friend module<T, M> operator-(module<T, M> lhs, const module<T, M>& rhs) {
+            lhs -= rhs;
+            return lhs;
+        }
+    protected:
+        T m_value;
+    };
+
+    template <typename T>
+    class degree : public module<T, T(360)>{};
+
 }

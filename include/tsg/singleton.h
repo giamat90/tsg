@@ -1,5 +1,6 @@
 #pragma once
 
+#include "tsg.h"
 #include "types.h"
 #include "io.h"
 
@@ -11,7 +12,7 @@ namespace tsg{
     } 
     
     template <typename T>
-    class singleton : public non_copyable {
+    class TSG_API singleton : public non_copyable {
     public:
         template <typename ...Args>
         static T& get_istance(Args... args){
