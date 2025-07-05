@@ -2,16 +2,6 @@
 #include <filesystem>
 #include <fstream>
 
-#ifdef _WIN32
-	#include <windows.h>
-#elif defined(__linux__)
-	#include <unistd.h>
-	#include <limits.h>
-#elif defined(__APPLE__)
-	#include <mach-o/dyld.h>
-	#include <limits.h>
-#endif
-
 namespace tsg {
 	class TSG_API os {
 	public:
@@ -32,7 +22,9 @@ namespace tsg {
 		void write(const std::string& s);
 		void write_line(const std::string& s);
 	private:
-		std::fstream m_file;
+		class impl;
+		impl* m_file;
+		//std::fstream m_file;
 		TYPE m_type{ TYPE::WR };
 	};
 }

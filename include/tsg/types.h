@@ -1,4 +1,6 @@
 #pragma once
+
+#include "tsg.h"
 #include <type_traits>
 #include <iterator>
 
@@ -25,7 +27,7 @@ namespace tsg {
     class non_copyable {
     public:
         non_copyable() = default;
-        ~non_copyable() = default;
+        virtual ~non_copyable() = default;
         non_copyable(const non_copyable&) = delete;
         non_copyable& operator=(const non_copyable&) = delete;
     };
@@ -134,4 +136,43 @@ namespace tsg {
         virtual tsg_iterator begin() = 0;
         virtual tsg_iterator end() = 0;
     };
+
+    template <typename T, typename ...Args>
+    static T& get_istance(Args... args) {
+        static T istance{ args... };
+        return istance;
+    }
+
+    template <typename T>
+    class singleton : public non_copyable {
+    public:
+        virtual ~singleton() = default;
+        template <typename ...Args>
+        static T& get_istance(Args... args) {
+            if (singleton<T>::m_istance) {
+                return *m_istance;
+            }
+            else {
+                static T istance{ args... };
+                singleton<T>::m_istance = &istance;
+                return istance;
+            }
+        }
+
+        static T& get_istance() {
+            if (singleton<T>::m_istance) {
+                return *m_istance;
+            }
+            else {
+                static T istance;
+                singleton<T>::m_istance = &istance;
+                return istance;
+            }
+        }
+    private:
+        static T* m_istance;
+    };
+
+    template<typename T>
+    T* singleton<T>::m_istance = nullptr;
 };

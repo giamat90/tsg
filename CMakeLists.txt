@@ -26,7 +26,7 @@ file(GLOB LESSONS_SOURCES
 )
 add_executable(lessons ${LESSONS_SOURCES})
 set_target_properties(lessons PROPERTIES FOLDER lessons)
-#target_link_libraries(lessons PRIVATE tsg)
+target_link_libraries(lessons PRIVATE tsg)
 target_compile_features(lessons PRIVATE cxx_std_20)
 add_compile_definitions(ENABLE=1)
 add_compile_definitions(DISABLE=0)

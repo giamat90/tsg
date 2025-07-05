@@ -2,6 +2,16 @@
 #include <fstream>
 #include <assert.h>
 
+#ifdef _WIN32
+#include <windows.h>
+#elif defined(__linux__)
+#include <unistd.h>
+#include <limits.h>
+#elif defined(__APPLE__)
+#include <mach-o/dyld.h>
+#include <limits.h>
+#endif
+
 namespace tsg {
 	std::filesystem::path os::get_exe_path() {
 #ifdef _WIN32
@@ -30,43 +40,48 @@ namespace tsg {
 #endif
 	}
 
+    class file::impl : public std::fstream {};
+
     file::file(const std::filesystem::path& p, const TYPE t) : m_type(t) 
     {
-        m_file.clear();
+        m_file = new impl();
+        m_file->clear();
         switch (m_type)
         {
         case tsg::file::TYPE::WR:
-            m_file.open(p.string(), std::ios::out);
-            if (m_file.is_open()) {
-                m_file.close();
-                m_file.open(p.string(), std::ios::in | std::ios::out);
+            m_file->open(p.string(), std::ios::out);
+            if (m_file->is_open()) {
+                m_file->close();
+                m_file->open(p.string(), std::ios::in | std::ios::out);
             }
             break;
         case tsg::file::TYPE::WO:
-            m_file.open(p.string(), std::ios::out);
+            m_file->open(p.string(), std::ios::out);
             break;
         case tsg::file::TYPE::RO:
-            m_file.open(p.string(), std::ios::in);
+            m_file->open(p.string(), std::ios::in);
             break;
         default:
-            m_file.open(p.string(), std::ios::binary);
+            m_file->open(p.string(), std::ios::binary);
             break;
         }
-        assert(m_file.is_open());
+        assert(m_file->is_open());
     }
     file::~file() {
-        m_file.close();
+        m_file->close();
+        delete m_file;
     }
 
-    void read() {
+    void file::read() {
         /* TODO */
+        throw;
     }
 
     void file::write(const std::string& s) {
-        m_file << s;
+        *m_file << s;
     }
 
     void file::write_line(const std::string& s) {
-        m_file << s << std::endl;
+        *m_file << s << std::endl;
     }
 }
