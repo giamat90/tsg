@@ -3,6 +3,7 @@
 #include "tsg.h"
 #include <string>
 #include <concepts>
+#include <format>
 
 namespace tsg {
     template <typename T>
@@ -18,7 +19,7 @@ namespace tsg {
         string(const std::string& s) : std::string(s) {};
          /* convert a pointer to a string as a number */
         template<typename T>
-        string(T* ptr) : std::string(std::to_string(reinterpret_cast<std::uintptr_t>(ptr))) {};
+        string(T* ptr) : std::string(std::format("{:p}", static_cast<void*>(ptr))) {};
         /* convert a Stringable */
         template <Stringable T>
         string(const T v) : std::string(std::to_string(v)) {};            
@@ -31,6 +32,7 @@ namespace tsg {
                 if (('{' == *str) && ('}' == *(str + 1))) {
                     *this += string(value);
                     *this += string(++(++str), args...);
+                    str = nullptr; // end
                 }
                 else {
                     *this += *str++;
