@@ -10,6 +10,6 @@
 #else
 #define TSG_API  __declspec(dllimport)
 #endif
-#else	// case unix
+#else	// case unix /* TODO: test */
 #define TSG2_API __attribute__ ((visibility ("default")))
 #endif

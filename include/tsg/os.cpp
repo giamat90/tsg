@@ -40,11 +40,55 @@ namespace tsg {
 #endif
 	}
 
+    tsg::string date::get_date(const TYPE t, const bool endline) {
+        tsg::string ret{};
+        /*
+        * ctime_s return a date in this format
+        * "DDD MMM  D HH:MM:SS YYYY\n"
+        */
+        auto now = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
+        char buffer[26];
+        ctime_s(buffer, sizeof(buffer), &now);
+        switch (t)
+        {
+        case(TYPE::FULL_DATE):
+            if (endline) {
+                ret = buffer;
+            }
+            else {
+                ret = std::string(buffer, size_t(24));
+            }
+            break;
+        case(TYPE::ONLY_DATE):
+            if (endline) {                
+                buffer[7] = '\n';
+                ret = std::string(buffer, size_t(8));
+            }
+            else {
+                ret = std::string(buffer, size_t(7));
+            }
+            break;
+        case(TYPE::ONLY_TIME):
+            if (endline) {
+                buffer[19] = '\n';
+                ret = std::string(buffer + 11, size_t(9));
+            }
+            else {
+                ret = std::string(buffer + 11, size_t(8));
+            }
+            break;
+        default:
+            break;
+        }
+        return ret;
+    }
+
     class file::impl : public std::fstream {};
 
     file::file(const std::filesystem::path& p, const TYPE t) : m_type(t) 
     {
         m_file = new impl();
+        m_file->exceptions(std::ifstream::failbit | std::ifstream::badbit); // enabling exceptions
         m_file->clear();
         switch (m_type)
         {

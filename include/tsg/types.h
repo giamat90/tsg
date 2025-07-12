@@ -138,41 +138,39 @@ namespace tsg {
     };
 
     template <typename T, typename ...Args>
-    static T& get_istance(Args... args) {
-        static T istance{ args... };
-        return istance;
+    static T& get_instance(Args... args) {
+        static T instance{ args... };
+        return instance;
     }
 
+    /* 
+    * TODO: as per now in multiple dll instantiation the singleton doesn't work because every dll has its own instance.
+    *       A solution can be store the istance in heap instead of stack. 
+    */
     template <typename T>
     class singleton : public non_copyable {
     public:
         virtual ~singleton() = default;
         template <typename ...Args>
-        static T& get_istance(Args... args) {
-            if (singleton<T>::m_istance) {
-                return *m_istance;
+        static T& get_instance(Args... args) {
+            if (singleton<T>::m_instance) {
+                return *m_instance;
             }
             else {
-                static T istance{ args... };
-                singleton<T>::m_istance = &istance;
-                return istance;
+                static T instance{ args... };
+                singleton<T>::m_instance = &instance;
+                return instance;
             }
         }
 
-        static T& get_istance() {
-            if (singleton<T>::m_istance) {
-                return *m_istance;
-            }
-            else {
-                static T istance;
-                singleton<T>::m_istance = &istance;
-                return istance;
+        template <typename ...Args>
+        static void make_instance(Args... args) {
+            if (nullptr == singleton<T>::m_instance) {
+                static T instance{ args... };
+                singleton<T>::m_instance = &instance;
             }
         }
     private:
-        static T* m_istance;
+        static inline T* m_instance{ nullptr };
     };
-
-    template<typename T>
-    T* singleton<T>::m_istance = nullptr;
-};
+    };

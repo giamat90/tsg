@@ -4,6 +4,9 @@
 #include <ctime>
 
 namespace tsg {
+
+	template class TSG_API singleton<logger>;
+
 	logger::logger(const std::string& file_name, const bool use_time) : m_file(tsg::os::get_exe_path() / file_name), m_use_time(use_time) {}
 
 	logger::~logger() {}

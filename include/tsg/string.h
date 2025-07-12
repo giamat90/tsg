@@ -39,6 +39,26 @@ namespace tsg {
                 }
             }
         }
+    public:
+        string& replace_c(const char old_c, const char new_c) {
+            for (char& c : *this) {
+                if (old_c == c) {
+                    c = new_c;
+                }
+            }
+            return *this;
+        }
+        string& replace_c(const std::initializer_list<char> list, const char new_c) {
+            for (char& c : *this) {
+                for (auto it = list.begin(); it != list.end(); ++it) {
+                    if (c == *it) {
+                        c = new_c;
+                        break;
+                    }
+                }
+            }
+            return *this;
+        }
     };
 }
 

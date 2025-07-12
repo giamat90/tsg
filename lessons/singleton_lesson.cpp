@@ -21,10 +21,10 @@ private:
 };
 
 
-// Getting i singleton istance
-A& get_istance(){
-    static A istance{42};
-    return istance;
+// Getting i singleton instance
+A& get_instance(){
+    static A instance{42};
+    return instance;
 }
 
 void lesson::run(){
@@ -33,10 +33,10 @@ void lesson::run(){
 
     tsg::print("### Dangerous use of singleton ###");
     {
-        // A x = get_istance();     // error: use of deleted function 'A::A(const A&)'
-        // auto y = get_istance();  // error: use of deleted function 'A::A(const A&)'
-        A& x = get_istance();       // ok
-        A& y = get_istance();       // ok
+        // A x = get_instance();     // error: use of deleted function 'A::A(const A&)'
+        // auto y = get_instance();  // error: use of deleted function 'A::A(const A&)'
+        A& x = get_instance();       // ok
+        A& y = get_instance();       // ok
         // print the state of our singletons
         x.print();
         y.print();
@@ -51,8 +51,8 @@ void lesson::run(){
 
     tsg::print("### Correct use of singleton ###");
     {
-        A& x = get_istance();       // ok
-        A& y = get_istance();       // ok
+        A& x = get_instance();       // ok
+        A& y = get_instance();       // ok
         // print the state of our singletons
         x.print();
         y.print();
