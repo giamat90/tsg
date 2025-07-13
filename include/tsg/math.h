@@ -1,11 +1,19 @@
-#pragma once
+#pragma onceT
 
 #include <cstdint>
 #include <cassert>
+#include <concepts>
+#include <type_traits>
 
 #include "io.h"
 
 namespace tsg{
+	template<typename T> 
+	concept Numeric = std::is_arithmetic_v<T>;
+
+	template<std::size_t D1, std::size_t D2>
+	concept DimensionLessThan = D1 < D2;
+
     using factorial_t = uint64_t;
 
     template <size_t N>
@@ -51,113 +59,130 @@ namespace tsg{
             values[1] = 1;
     }
   
-    template<typename T>
-    inline constexpr T pow(const T base, const T exp){
+    template<typename Numeric>
+    inline constexpr Numeric pow(const Numeric base, const Numeric exp){
         return exp > 0 ? base * pow(base, exp-1) : 1;
     }
 
-    template <typename T, T M>
+    template <typename Numeric, Numeric M>
     class module {
     public:
-        module(const T value) {
+        module(const Numeric value) {
             if (value > M) {
-                m_value += T(0);
+                m_value += Numeric(0);
             }
             if (value < 0) {
-                m_value -= T(0);
+                m_value -= Numeric(0);
             }
         }
-        inline module<T,M>& operator+=(const module<T, M>& other) {
+        inline module<Numeric,M>& operator+=(const module<Numeric, M>& other) {
             m_value += other.m_value;
             if (m_value > M) {
                 m_value -= M;
             }
         }
-        inline friend module<T, M> operator+(module<T, M> lhs, const module<T, M>& rhs) {
+        inline friend module<Numeric, M> operator+(module<Numeric, M> lhs, const module<Numeric, M>& rhs) {
             lhs += rhs;
             return lhs;
         }
-        inline module<T, M>& operator-=(const module<T, M>& other) {
+        inline module<Numeric, M>& operator-=(const module<Numeric, M>& other) {
             m_value -= other.m_value;
-            if (m_value < T(0)) {
+            if (m_value < Numeric(0)) {
                 m_value = M - m_value;
             }
         }
-        inline friend module<T, M> operator-(module<T, M> lhs, const module<T, M>& rhs) {
+        inline friend module<Numeric, M> operator-(module<Numeric, M> lhs, const module<Numeric, M>& rhs) {
             lhs -= rhs;
             return lhs;
         }
     protected:
-        T m_value;
+		Numeric m_value;
     };
 
-    template <typename T>
-    class degree : public module<T, T(360)>{};
+    template <typename Numeric>
+    class degree : public module<Numeric, Numeric(360)>{};
 
     /* Vector class */
 
-	template<typename T, std::size_t Dim>
+	template<typename Numeric, std::size_t Dim>
 	class vector {
 	public:
 		vector() {
 			for (size_t i = 0u; i < Dim; ++i) {
-				m_v[i] = T();
+				m_v[i] = Numeric();
 			}
 		}
 
-		vector(const T k) {
+		vector(const Numeric k) {
 			for (size_t i = 0u; i < Dim; ++i) {
 				m_v[i] = k;
 			}
 		}
 
-		vector(const std::initializer_list<T>& list) {
+		vector(const std::initializer_list<Numeric>& list) {
 			assert(Dim == list.size());
 			auto it = list.begin();
 			for (std::size_t i{}; i < Dim, it != list.end(); ++i, ++it) {
 				m_v[i] = *it;
 			}
 		}
+		vector(const Numeric array[Dim]) {
+			for (std::size_t i = 0u; i < Dim; ++i) {
+				m_v[i] = array[i];
+			}
+		}
 
 		/*
 		* It is possible create a vector from another one of minor size
 		*/
-		template <size_t S, std::enable_if_t<S < Dim, void>>
-		explicit vector(const vector<T, S> other) {
+		template <size_t S> requires DimensionLessThan<D, S>
+		explicit vector(const vector<Numeric, S> other) {
 			static_assert(S < Dim);
 			for (size_t i{}; i < S; ++i) {
 				m_v[i] = other.m_v[i];
 			}
 			for (size_t j = S; j < Dim; ++j) {
-				m_v[j] = T{};
+				m_v[j] = Numeric{};
 			}
 		}
 
-		vector(const vector<T, Dim>& other) {
+		vector(const vector<Numeric, Dim>& other) {
 			for (std::size_t i = 0u; i < Dim; ++i) {
 				m_v[i] = other.m_v[i];
 			}
 		}
 	public:
-		T get_norm() const {
-			T value{};
+		Numeric get_norm() const {
+			Numeric value{};
 			for (std::size_t i = 0u; i < Dim; ++i) {
 				value += m_v[i] * m_v[i];
 			}
-			return sqrt(value);
+			if constexpr (std::is_same_v<Numeric, float>) {
+				return std::sqrtf(value);
+			}
+			else if constexpr (std::is_same_v<Numeric, double>) {
+				return std::sqrt(value);
+			}
+			else if constexpr (std::is_same_v<Numeric, long double>) {
+				return std::sqrtl(value);
+			}
+			else {
+				// Generic sqrt for other types
+				return std::sqrt(value);
+			};
 		}
-		vector<T, Dim> get_normalized() {
-			T norm = get_norm();
-			if (norm > T(0)) {
-				T inverse_norm = T(1) / norm;
+		vector<Numeric, Dim> get_normalized() {
+			Numeric norm = get_norm();
+			if (norm > Numeric(0)) {
+				Numeric inverse_norm = Numeric(1) / norm;
 				return inverse_norm * (*this);
 			}
 			throw;
 		}
 		void normalize() {
-			T norm = get_norm();
-			if (norm > T(0)) {
-				T inverse_norm{ T(1) / norm };
+			Numeric norm = get_norm();
+			if (norm > Numeric(0)) {
+				Numeric inverse_norm{ Numeric(1) / norm };
 				for (std::size_t i = 0u; i < Dim; ++i) {
 					m_v[i] *= inverse_norm;
 				}
@@ -169,7 +194,7 @@ namespace tsg{
 	public:
 		// getters
 		template <std::size_t axes>
-		inline T get() {
+		inline Numeric get() {
 			static_assert(axes < Dim);
 			return m_v[axes];
 		}
@@ -177,13 +202,13 @@ namespace tsg{
 		/* Special cases */
 		void zero() {
 			for (size_t i = 0u; i < Dim; ++i) {
-				m_v[i] = T();
+				m_v[i] = Numeric();
 			}
 			m_type = TYPE::ZERO;
 		}
 		bool is_zero() {
 			for (size_t i = 0u; i < Dim; ++i) {
-				if (m_v[i] > T() || m_v[i] < T()) {
+				if (m_v[i] > Numeric() || m_v[i] < Numeric()) {
 					return false;
 				}
 			}
@@ -192,14 +217,14 @@ namespace tsg{
 		}
 		void one() {
 			for (size_t i = 0u; i < Dim; ++i) {
-				m_v[i] = T(1);
+				m_v[i] = Numeric(1);
 			}
 			m_type = TYPE::ONE;
 		}
 		bool is_one() {
-			auto acc = T(1);
+			auto acc = Numeric(1);
 			for (size_t i = 0u; i < Dim; ++i) {
-				if ((acc *= m_v[i]) != T(1)) {
+				if ((acc *= m_v[i]) != Numeric(1)) {
 					return false;
 				}
 			}
@@ -209,71 +234,83 @@ namespace tsg{
 	public:
 		/* Operator overloading */
 		// operator[]
-		inline T& operator[](const std::size_t a) {
+		inline Numeric& operator[](const std::size_t a) {
 			if (a < Dim) {
 				return m_v[a];
 			}
 			else {
-				throw(std::numeric_limits<T>::infinity());
+				throw(std::numeric_limits<Numeric>::infinity());
 			}
 		}
-		inline const T& operator[](const std::size_t a) const {
+		inline const Numeric& operator[](const std::size_t a) const {
 			if (a < Dim) {
 				return m_v[a];
 			}
 			else {
-				throw(std::numeric_limits<T>::infinity());
+				throw(std::numeric_limits<Numeric>::infinity());
 			}
 		}
 		// sum between vectors
-		inline vector<T, Dim>& operator+=(const vector<T, Dim>& other) {
+		inline vector<Numeric, Dim>& operator+=(const vector<Numeric, Dim>& other) {
 			for (size_t i = 0u; i < Dim; ++i) {
 				m_v[i] += other.m_v[i];
 			}
 			return *this;
 		}
-		inline friend vector<T, Dim> operator+(vector<T, Dim> lhs, const vector<T, Dim>& rhs) {
+		inline friend vector<Numeric, Dim> operator+(vector<Numeric, Dim> lhs, const vector<Numeric, Dim>& rhs) {
 			lhs += rhs;
 			return lhs;
 		}
-		inline vector<T, Dim>& operator-=(const vector<T, Dim>& other) {
+		inline vector<Numeric, Dim>& operator-=(const vector<Numeric, Dim>& other) {
 			for (size_t i = 0u; i < Dim; ++i) {
 				m_v[i] -= other.m_v[i];
 			}
 			return *this;
 		}
-		inline friend vector<T, Dim> operator-(vector<T, Dim> lhs, const vector<T, Dim>& rhs) {
+		inline friend vector<Numeric, Dim> operator-(vector<Numeric, Dim> lhs, const vector<Numeric, Dim>& rhs) {
 			lhs -= rhs;
 			return lhs;
 		}
-		// multiply for a T lhs
+		// multiply for a Numeric lhs
 		/* for k * vec */
-		inline vector<T, Dim> operator*(const T k) {
-			vector<T, Dim> ret(T(1));
+		inline vector<Numeric, Dim> operator*(const Numeric k) {
+			vector<Numeric, Dim> ret(Numeric(1));
 			for (size_t i = 0u; i < Dim; ++i) {
 				ret.m_v[i] = m_v[i] * k;
 			}
 			return ret;
 		}
 		/* for vec * k */
-		inline friend vector<T, Dim> operator*(const T k, vector<T, Dim> vec) {
+		inline friend vector<Numeric, Dim> operator*(const Numeric k, vector<Numeric, Dim> vec) {
 			return  vec.operator*(k);
 		};
 
-		static T dot(vector<T, Dim> lhs, vector<T, Dim> rhs) {
-			T value{ T(0) };
+		static Numeric dot(vector<Numeric, Dim> lhs, vector<Numeric, Dim> rhs) {
+			Numeric value{ Numeric(0) };
 			for (std::size_t i = 0u; i < Dim; ++i) {
 				value += lhs.m_v[i] * rhs.m_v[i];
 			}
 			return value;
 		}
 
-		static vector<T, Dim> cross() {
-			/*TODO*/
-			throw;
+		/* 
+		* Valid only for 3-dimensional vectors
+		*/
+		static vector<Numeric, Dim> cross(const vector<Numeric, Dim>& lhs, const vector<Numeric, Dim>& rhs) {
+			static_assert(Dim == 3);
+			return {
+				lhs.m_v[1] * rhs.m_v[2] - lhs.m_v[2] * rhs.m_v[1],
+				lhs.m_v[2] * rhs.m_v[0] - lhs.m_v[0] * rhs.m_v[2],
+				lhs.m_v[0] * rhs.m_v[1] - lhs.m_v[1] * rhs.m_v[0],
+			};
 		}
 
-		T get_angle(const vector<T, Dim>& other) {
+		void wedge(void) const {
+			/* TODO */
+			assert(false);
+		}
+
+		Numeric get_angle(const vector<Numeric, Dim>& other) {
 			if (TYPE::ONE == m_type) {
 				return arccos(*this->dot(other) / other.get_norm());
 			}
@@ -294,87 +331,115 @@ namespace tsg{
 			ONE
 		};
 	private:
-		T m_v[Dim];
+		Numeric m_v[Dim];
 		TYPE m_type{ TYPE::NONE };
 	};
 
 	/* Matrix class */
-    template<typename T, size_t Row, size_t Col>
+    template<typename Numeric, size_t Row, size_t Col>
 	class matrix {
 	public:
 		enum class TYPE {
 			ZERO,
-			ONCE,
-			IDENTICAL
+			ONE,
+			IDENTITY,
+			DIAGONAL,
+			UNKNOWN
 		};
 	public:
 		// ctors and dtors
 		matrix() = default;
 		~matrix() = default;
-		matrix(const TYPE t) {
+		matrix(const TYPE t, const Numeric value = Numeric(1)) {
 			constexpr std::size_t min_size = std::min(Row, Col);
 			switch (t)
 			{
-			case(TYPE::ONCE):
+			case(TYPE::ONE):
 				for (std::size_t i = 0u; i < Row; ++i) {
 					for (std::size_t j = 0u; j < Col; ++j) {
-						m_d[i][j] = T(1);
+						m_d[i][j] = Numeric(1);
 					}
 				}
+				m_type = TYPE::ONE;
 				break;
-			case(TYPE::IDENTICAL):
+			case(TYPE::IDENTITY):
 				for (std::size_t k = 0u; k < min_size; ++k) {
-					m_d[k][k] = T(1);
+					m_d[k][k] = Numeric(1);
 				}
+				m_type = TYPE::IDENTITY;
+				break;
+			case(TYPE::DIAGONAL):
+				for (std::size_t k = 0u; k < min_size; ++k) {
+					m_d[k][k] = value;
+				}
+				m_type = TYPE::DIAGONAL;
 				break;
 			case(TYPE::ZERO):
 			default:
 				for (std::size_t i = 0u; i < Row; ++i) {
 					for (std::size_t j = 0u; j < Col; ++j) {
-						m_d[i][j] = T(0);
+						m_d[i][j] = Numeric(0);
 					}
 				}
+				m_type = TYPE::ZERO;
 				break;
 			}
-		}
+		};
 	public:
-		template <std::size_t C>
-		vector<T, Row> get_col() {
-			vector<T, Row> ret;
+		bool is_one() const { return TYPE::ONE == m_type; };
+		bool is_zero() const { return TYPE::ZERO == m_type; };
+		bool is_diagonal() const { return TYPE::DIAGONAL == m_type; };
+		bool is_identity() const { return TYPE::IDENTITY == m_type; };
+	public:
+		template <std::size_t J>
+		vector<Numeric, Row> get_col() {
+			vector<Numeric, Row> ret;
 			for (std::size_t i = 0u; i < Row; ++i) {
-				ret[i] = m_d[i][C];
+				ret[i] = m_d[i][J];
 			}
 			return ret;
 		};
 
-		template <std::size_t R>
-		vector<T, Col> get_row() {
-			return m_d[R];
+		vector<Numeric, Row> get_col(const std::size_t j) {
+			vector<Numeric, Row> ret;
+			for (std::size_t i = 0u; i < Row; ++i) {
+				ret[i] = m_d[i][j];
+			}
+			return ret;
+		};
+
+		template <std::size_t I>
+		vector<Numeric, Col> get_row() {
+			return m_d[I];
+		};
+
+		vector<Numeric, Col> get_row(const std::size_t i) {
+			return m_d[i];
 		};
 	public:
 		// operators
 		/* Old syle operator m(i,j) */
-		inline T& operator()(const T r, const T c) {
-			static_assert(r < Row&& c < Col);
+		inline Numeric& operator()(const std::size_t r, const std::size_t c) {
+			assert(r < Row&& c < Col);
 			return m_d[r][c];
 		}
-		inline const T& operator()(const T r, const T c) const {
+		inline const Numeric& operator()(const Numeric r, const Numeric c) const {
 			static_assert(r < Row&& c < Col);
 			return m_d[r][c];
 		}
 #if __cplusplus >= 202302L
 		/* c++23 style operator m[i,j] */
-		inline T& operator[](const std::size_t i, const std::size_t j) {
+		inline Numeric& operator[](const std::size_t i, const std::size_t j) {
 			static_assert(i < Row&& j < Col);
 			return m_d[i][j];
 		}
-		inline const T& operator[](const std::size_t i, const std::size_t j) {
+		inline const Numeric& operator[](const std::size_t i, const std::size_t j) {
 			static_assert(i < Row&& j < Col);
 			return m_d[i][j];
 		}
 #endif
 		// operator += and +
-		inline matrix<T, Row, Col>& operator+=(const matrix<T, Row, Col>& other) {
+		inline matrix<Numeric, Row, Col>& operator+=(const matrix<Numeric, Row, Col>& other) {
 			for (std::size_t i = 0u; i < Row; ++i) {
 				for (std::size_t j = 0u; j < Col; ++j) {
 					m_d[i][j] += other.m_d[i][j];
@@ -382,11 +447,37 @@ namespace tsg{
 			}
 			return *this;
 		}
-		inline friend matrix<T, Row, Col>& operator+(matrix<T, Row, Col>& lhs, const matrix<T, Row, Col>& rhs) {
+		inline friend matrix<Numeric, Row, Col>& operator+(matrix<Numeric, Row, Col>& lhs, const matrix<Numeric, Row, Col>& rhs) {
 			return lhs += rhs;
 		}
+		// operator *= and * with other matrix
+		template<std::size_t N>
+		inline matrix<Numeric, Row, N>& operator*=(const matrix<Numeric, Col, N>& other) {
+			matrix<Numeric, Row, N> res(TYPE::ZERO);
+			for (std::size_t i = 0u; i < Row; ++i) {
+				for (std::size_t j = 0u; j < N; ++j) {
+					for (std::size_t k = 0u; k < Col; ++k) {
+						res[i][j] += m_d[i][k] * other.m_d[k][j];
+					}
+				}
+			}
+			return res;
+		}
+		// operator * and *= with a scalar
+		inline matrix<Numeric, Row, Col>& operator*=(const Numeric value) {
+			for (std::size_t i = 0u; i < Row; ++i) {
+				for (std::size_t j = 0u; j < Col; ++j) {
+					m_d[i][j] *= value;
+				}
+			}
+			return *this;
+		}
+		inline friend matrix<Numeric, Row, Col>& operator*(matrix<Numeric, Row, Col>& matrix, const Numeric value) {
+			return matrix *= value;
+		}
 	private:
-		T m_d[Row][Col];
+		Numeric m_d[Row][Col];
+		TYPE m_type{ TYPE::UNKNOWN };
 	};
 
 }
