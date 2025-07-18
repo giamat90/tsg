@@ -10,7 +10,11 @@ namespace tsg {
     concept Stringable = requires(T v) {
         { std::to_string(v) } -> std::convertible_to<std::string>;
     };
-
+    
+    /*
+    * This string allow the creation of strings python-like, for example:
+    * auto str = tsg::string("Hello World {}", 616) --> str = "Hello World 616"
+    */
     class string : public std::string {
     public:
         /* Default c-tor */
@@ -40,6 +44,7 @@ namespace tsg {
             }
         }
     public:
+        /* replace all occurencies of old_c inside the string with new_c */
         string& replace_c(const char old_c, const char new_c) {
             for (char& c : *this) {
                 if (old_c == c) {
@@ -48,6 +53,8 @@ namespace tsg {
             }
             return *this;
         }
+
+        /* replace all occurencies of the char's list inside the string with new_c */
         string& replace_c(const std::initializer_list<char> list, const char new_c) {
             for (char& c : *this) {
                 for (auto it = list.begin(); it != list.end(); ++it) {

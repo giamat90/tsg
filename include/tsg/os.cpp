@@ -111,6 +111,7 @@ namespace tsg {
         }
         assert(m_file->is_open());
     }
+    
     file::~file() {
         m_file->close();
         delete m_file;
