@@ -152,6 +152,7 @@ namespace tsg{
 			}
 		}
 	public:
+		/* Norm */
 		Numeric get_norm() const {
 			Numeric value{};
 			for (std::size_t i = 0u; i < Dim; ++i) {
@@ -233,6 +234,22 @@ namespace tsg{
 		}
 	public:
 		/* Operator overloading */
+		// operator= with another vector
+		inline vector<Numeric, Dim> operator=(const vector<Numeric, Dim>& other) {
+			for (std::size_t i = 0u; i < Dim; ++i) {
+				this->m_v[i] = other.m_v[i];
+			}
+			return *this;
+		}
+		// operator= with an initlist
+		inline vector<Numeric, Dim>& operator=(const std::initializer_list<Numeric> list) {
+			assert(Dim == list.size());
+			auto it = list.begin();
+			for (std::size_t i{}; i < Dim, it != list.end(); ++i, ++it) {
+				m_v[i] = *it;
+			}
+			return *this;
+		}
 		// operator[]
 		inline Numeric& operator[](const std::size_t a) {
 			if (a < Dim) {
@@ -272,17 +289,19 @@ namespace tsg{
 			return lhs;
 		}
 		// multiply for a Numeric lhs
-		/* for k * vec */
-		inline vector<Numeric, Dim> operator*(const Numeric k) {
-			vector<Numeric, Dim> ret(Numeric(1));
+		inline vector<Numeric, Dim>& operator*=(const Numeric k) {
 			for (size_t i = 0u; i < Dim; ++i) {
-				ret.m_v[i] = m_v[i] * k;
+				m_v[i] *= k;
 			}
-			return ret;
+			return *this;
 		}
-		/* for vec * k */
+		/* for vec*k */
+		inline friend vector<Numeric, Dim> operator*(vector<Numeric, Dim> vec, const Numeric k) {
+			return  vec *= k;
+		};
+		/* for k*vec */
 		inline friend vector<Numeric, Dim> operator*(const Numeric k, vector<Numeric, Dim> vec) {
-			return  vec.operator*(k);
+			return  vec *= k;
 		};
 
 		static Numeric dot(vector<Numeric, Dim> lhs, vector<Numeric, Dim> rhs) {
@@ -338,6 +357,8 @@ namespace tsg{
 	/* Matrix class */
     template<typename Numeric, size_t Row, size_t Col>
 	class matrix {
+		using row_t = std::size_t;
+		using col_t = std::size_t;
 	public:
 		enum class TYPE {
 			ZERO,
@@ -363,14 +384,18 @@ namespace tsg{
 				m_type = TYPE::ONE;
 				break;
 			case(TYPE::IDENTITY):
-				for (std::size_t k = 0u; k < min_size; ++k) {
-					m_d[k][k] = Numeric(1);
+				for (std::size_t i = 0u; i < Row; ++i) {
+					for (std::size_t j = 0u; j < Col; ++j) {
+						m_d[i][j] = (i == j) ? Numeric(1) : Numeric(0);
+					}
 				}
 				m_type = TYPE::IDENTITY;
 				break;
 			case(TYPE::DIAGONAL):
-				for (std::size_t k = 0u; k < min_size; ++k) {
-					m_d[k][k] = value;
+				for (std::size_t i = 0u; i < Row; ++i) {
+					for (std::size_t j = 0u; j < Col; ++j) {
+						m_d[i][j] = (i == j) ? value : Numeric(0);
+					}
 				}
 				m_type = TYPE::DIAGONAL;
 				break;
@@ -420,24 +445,13 @@ namespace tsg{
 		// operators
 		/* Old syle operator m(i,j) */
 		inline Numeric& operator()(const std::size_t r, const std::size_t c) {
-			assert(r < Row&& c < Col);
+			assert(r < Row && c < Col);
 			return m_d[r][c];
 		}
 		inline const Numeric& operator()(const Numeric r, const Numeric c) const {
-			static_assert(r < Row&& c < Col);
+			static_assert(r < Row && c < Col);
 			return m_d[r][c];
 		}
-#if __cplusplus >= 202302L
-		/* c++23 style operator m[i,j] */
-		inline Numeric& operator[](const std::size_t i, const std::size_t j) {
-			static_assert(i < Row&& j < Col);
-			return m_d[i][j];
-		}
-		inline const Numeric& operator[](const std::size_t i, const std::size_t j) {
-			static_assert(i < Row&& j < Col);
-			return m_d[i][j];
-		}
-#endif
 		// operator += and +
 		inline matrix<Numeric, Row, Col>& operator+=(const matrix<Numeric, Row, Col>& other) {
 			for (std::size_t i = 0u; i < Row; ++i) {
