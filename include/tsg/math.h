@@ -4,6 +4,7 @@
 #include <cassert>
 #include <concepts>
 #include <type_traits>
+#include <expected>
 
 #include "io.h"
 
@@ -112,13 +113,11 @@ namespace tsg{
 				m_v[i] = Numeric();
 			}
 		}
-
 		vector(const Numeric k) {
 			for (size_t i = 0u; i < Dim; ++i) {
 				m_v[i] = k;
 			}
 		}
-
 		vector(const std::initializer_list<Numeric>& list) {
 			assert(Dim == list.size());
 			auto it = list.begin();
@@ -131,7 +130,6 @@ namespace tsg{
 				m_v[i] = array[i];
 			}
 		}
-
 		/*
 		* It is possible create a vector from another one of minor size
 		*/
@@ -192,6 +190,19 @@ namespace tsg{
 				throw;
 			}
 		};
+		/* Reciprocal */
+		std::expected<vector<Numeric, Dim>, bool> reciprocal() const {
+			vector<Numeric, Dim> reciproc(Numeric(1));
+			for (std::size_t i = 0u; i < Dim; ++i) {
+				if (0 == m_v[i]) {
+					std::unexpect(false);
+				}
+				else {
+					reciproc.m_v[i] = Numeric(1) / m_v[i];
+				}
+			}
+			return reciproc;
+		}
 	public:
 		// getters
 		template <std::size_t axes>
