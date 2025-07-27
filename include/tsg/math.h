@@ -119,10 +119,13 @@ namespace tsg{
 			}
 		}
 		vector(const std::initializer_list<Numeric>& list) {
-			assert(Dim == list.size());
+			assert(Dim >= list.size());
 			auto it = list.begin();
-			for (std::size_t i{}; i < Dim, it != list.end(); ++i, ++it) {
+			for (std::size_t i{}; i < list.size(), it != list.end(); ++i, ++it) {
 				m_v[i] = *it;
+			}
+			for (std::size_t i{}; i < Dim - list.size(); ++i) {
+				m_v[i + list.size()] = Numeric();
 			}
 		}
 		vector(const Numeric array[Dim]) {
@@ -195,7 +198,7 @@ namespace tsg{
 			vector<Numeric, Dim> reciproc(Numeric(1));
 			for (std::size_t i = 0u; i < Dim; ++i) {
 				if (0 == m_v[i]) {
-					std::unexpect(false);
+					return std::unexpected(false);
 				}
 				else {
 					reciproc.m_v[i] = Numeric(1) / m_v[i];
@@ -203,11 +206,21 @@ namespace tsg{
 			}
 			return reciproc;
 		}
+		void scale(const Numeric k) {
+			for (std::size_t i = 0u; i < Dim; ++i) {
+				m_v[i] *= k;
+			}
+		}
+		void scale(const vector<Numeric, Dim> vk) {
+			for (std::size_t i = 0u; i < Dim; ++i) {
+				m_v[i] *= vk[i];
+			}
+		}
 	public:
 		// getters
 		template <std::size_t axes>
 		inline Numeric get() {
-			static_assert(axes < Dim);
+			//static_assert(axes < Dim);
 			return m_v[axes];
 		}
 	public:
@@ -243,6 +256,18 @@ namespace tsg{
 			m_type = TYPE::ONE;
 			return true;
 		}
+		bool is_nan() {
+			bool is_nan{ false };
+			try {
+				for (size_t i{}; i < Dim; ++i) {
+					is_nan |= std::isnan(m_v[i]);
+				}
+				return is_nan;
+			}
+			catch (...) {
+				assert(0);
+			}
+		}
 	public:
 		/* Operator overloading */
 		// operator= with another vector
@@ -267,7 +292,7 @@ namespace tsg{
 				return m_v[a];
 			}
 			else {
-				throw(std::numeric_limits<Numeric>::infinity());
+				assert(0);
 			}
 		}
 		inline const Numeric& operator[](const std::size_t a) const {
@@ -445,11 +470,11 @@ namespace tsg{
 		};
 
 		template <std::size_t I>
-		vector<Numeric, Col> get_row() {
+		const vector<Numeric, Col>& get_row() const {
 			return m_d[I];
 		};
 
-		vector<Numeric, Col> get_row(const std::size_t i) {
+		vector<Numeric, Col> get_row(const std::size_t i) const {
 			return m_d[i];
 		};
 	public:
