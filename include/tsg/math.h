@@ -339,7 +339,18 @@ namespace tsg{
 		inline friend vector<Numeric, Dim> operator*(const Numeric k, vector<Numeric, Dim> vec) {
 			return  vec *= k;
 		};
-
+		/*
+		* equality operator
+		*/
+		inline bool operator==(const vector<Numeric, Dim>& other) const {
+			for (std::size_t i = 0u; i < Dim; ++i) {
+				if (m_v[i] != other.m_v[i]) {
+					return false;
+				}
+			}
+			return true;
+		}
+	public:
 		static Numeric dot(vector<Numeric, Dim> lhs, vector<Numeric, Dim> rhs) {
 			Numeric value{ Numeric(0) };
 			for (std::size_t i = 0u; i < Dim; ++i) {
