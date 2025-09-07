@@ -3,6 +3,7 @@
 #include "tsg.h"
 #include <type_traits>
 #include <iterator>
+#include "string.h"
 
 namespace tsg {
 
@@ -173,4 +174,9 @@ namespace tsg {
     private:
         static inline T* m_instance{ nullptr };
     };
+
+    class stringable {
+    public:
+        virtual tsg::string to_string() = 0;
     };
+};

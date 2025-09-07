@@ -5,6 +5,7 @@
 #include <concepts>
 #include <type_traits>
 #include <expected>
+#include "types.h"
 
 #include "io.h"
 
@@ -61,7 +62,7 @@ namespace tsg{
     }
   
     template<typename Numeric>
-    inline constexpr Numeric pow(const Numeric base, const Numeric exp){
+    inline constexpr Numeric pow(const Numeric base, const std::size_t exp){
         return exp > 0 ? base * pow(base, exp-1) : 1;
     }
 
@@ -106,7 +107,7 @@ namespace tsg{
     /* Vector class */
 
 	template<typename Numeric, std::size_t Dim>
-	class vector {
+	class vector : public tsg::stringable {
 	public:
 		vector() {
 			for (size_t i = 0u; i < Dim; ++i) {
@@ -136,11 +137,11 @@ namespace tsg{
 		/*
 		* It is possible create a vector from another one of minor size
 		*/
-		template <size_t S> requires DimensionLessThan<D, S>
-		explicit vector(const vector<Numeric, S> other) {
+		template <size_t S> requires DimensionLessThan<S, Dim>
+		explicit vector(vector<Numeric, S>& other) {
 			static_assert(S < Dim);
 			for (size_t i{}; i < S; ++i) {
-				m_v[i] = other.m_v[i];
+				m_v[i] = other[i];
 			}
 			for (size_t j = S; j < Dim; ++j) {
 				m_v[j] = Numeric{};
@@ -169,7 +170,7 @@ namespace tsg{
 				return std::sqrtl(value);
 			}
 			else {
-				// Generic sqrt for other types
+				// Generic sqrt for other types: make compiler choose the right one
 				return std::sqrt(value);
 			};
 		}
@@ -206,6 +207,7 @@ namespace tsg{
 			}
 			return reciproc;
 		}
+		/* Scaling */
 		void scale(const Numeric k) {
 			for (std::size_t i = 0u; i < Dim; ++i) {
 				m_v[i] *= k;
@@ -214,6 +216,18 @@ namespace tsg{
 		void scale(const vector<Numeric, Dim> vk) {
 			for (std::size_t i = 0u; i < Dim; ++i) {
 				m_v[i] *= vk[i];
+			}
+		}
+		template <typename T> // SFINAE
+		vector<Numeric, Dim> get_scalarized(const T k) {
+			vector<Numeric, Dim> ret(*this);
+			ret.scale(k);
+			return ret;
+		}
+		/* translation */
+		void translate(const vector<Numeric, Dim>& t) {
+			for (std::size_t i = 0u; i < Dim; ++i) {
+				m_v[i] += t.m_v[i];
 			}
 		}
 	public:
@@ -358,7 +372,6 @@ namespace tsg{
 			}
 			return value;
 		}
-
 		/* 
 		* Valid only for 3-dimensional vectors
 		*/
@@ -390,7 +403,17 @@ namespace tsg{
 				return arccos(*this->dot(other) / (get_norm() * other.get_norm()));
 			}
 		}
-	private:
+public:
+	tsg::string to_string() override {
+		tsg::string ret{ "("};
+		for (std::size_t i{}; i < Dim; ++i) {
+			ret += i;
+			ret += ",";
+		}
+		ret += ")";
+		return ret;
+	}
+private:
 		enum class TYPE {
 			NONE,
 			ZERO,
