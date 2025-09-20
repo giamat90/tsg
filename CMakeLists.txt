@@ -31,3 +31,6 @@ target_compile_features(lessons PRIVATE cxx_std_23)
 add_compile_definitions(ENABLE=1)
 add_compile_definitions(DISABLE=0)
 include_directories("${CMAKE_CURRENT_SOURCE_DIR}/include/")
+
+# Set the folder for Visual Studio
+set_target_properties(tsg PROPERTIES FOLDER "tsg")
