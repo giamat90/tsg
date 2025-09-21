@@ -45,6 +45,7 @@ namespace tsg {
         /*
         * ctime_s return a date in this format
         * "DDD MMM  D HH:MM:SS YYYY\n"
+		* That has 26 characters including the null terminator
         */
         auto now = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
         char buffer[26];
@@ -113,8 +114,11 @@ namespace tsg {
     }
     
     file::~file() {
-        m_file->close();
-        delete m_file;
+        if (m_file) {
+            m_file->close();
+            delete m_file;
+            m_file = nullptr;
+        }
     }
 
     void file::read() {
