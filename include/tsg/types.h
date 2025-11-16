@@ -8,9 +8,9 @@
 namespace tsg {
 
     template<typename T>
-    class adapter {
+    class adapter_r {
     public:
-        inline T* const get_adaptee() { return m_adaptee; }
+        inline T* const get_adaptee_r() { return m_adaptee; } /* Doesn't have a get_adaptee_v because of incomplete type compilation error */
         inline void set_adaptee(T* const a) { m_adaptee = a; }
     protected:
         T* m_adaptee{ nullptr };
@@ -19,7 +19,8 @@ namespace tsg {
     template<typename T>
     class adapter_v {
     public:
-        inline T* const get_adaptee() { return &m_adaptee; }
+        inline T* const get_adaptee_r() { return &m_adaptee; }
+        inline T const get_adaptee_v() const { return m_adaptee; }
         inline void set_adaptee(const T a) { m_adaptee = a; }
     protected:
         T m_adaptee{};
