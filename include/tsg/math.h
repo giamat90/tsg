@@ -138,7 +138,7 @@ namespace tsg{
 		* It is possible create a vector from another one of minor size
 		*/
 		template <size_t S> requires DimensionLessThan<S, Dim>
-		vector(vector<Numeric, S>& other) {
+		vector(const vector<Numeric, S>& other) {
 			static_assert(S < Dim);
 			for (size_t i{}; i < S; ++i) {
 				m_v[i] = other[i];
