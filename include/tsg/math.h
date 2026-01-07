@@ -233,7 +233,7 @@ namespace tsg{
 	public:
 		// getters
 		template <std::size_t axes>
-		inline Numeric get() {
+		inline Numeric get() const {
 			//static_assert(axes < Dim);
 			return m_v[axes];
 		}
