@@ -213,15 +213,21 @@ namespace tsg{
 				m_v[i] *= k;
 			}
 		}
+		template <typename T> // SFINAE
+		vector<Numeric, Dim> get_scalarized(const T k) {
+			vector<Numeric, Dim> ret(*this);
+			ret.scale(k);
+			return ret;
+		}
 		void scale(const vector<Numeric, Dim> vk) {
 			for (std::size_t i = 0u; i < Dim; ++i) {
 				m_v[i] *= vk[i];
 			}
 		}
 		template <typename T> // SFINAE
-		vector<Numeric, Dim> get_scalarized(const T k) {
+		vector<Numeric, Dim> get_scalarized(const vector<T, Dim> vk) {
 			vector<Numeric, Dim> ret(*this);
-			ret.scale(k);
+			ret.scale(vk);
 			return ret;
 		}
 		/* translation */
